@@ -16,7 +16,6 @@ struct Node {
         int row = -1; // y coordinate
         int col = -1; // x coordinate
         int size = -1;
-        string name;
         Node* colHeader;
 
         Node() {};
@@ -28,7 +27,7 @@ class AlgorithmX {
         Node* colHeader;
         Node* root;
     public:
-        Node solution[20];
+        Node solution[1000];
         AlgorithmX(Node* r) {
             root = r;
             colHeader = r;
@@ -36,7 +35,6 @@ class AlgorithmX {
 
         void search(int k) {
             if (root->right == root) {
-                int lol = 3;
                 return;
             };
             colHeader = chooseColumn(root);
@@ -98,7 +96,7 @@ class AlgorithmX {
 
         Node* chooseColumn(Node* root) {
             Node* temp = root->right;
-            int minSize = 999;
+            int minSize = 10000;
             Node* chosenCol;
             while(temp != root) {
                 if (temp->size < minSize && temp->size >= 0) {
@@ -114,8 +112,8 @@ class AlgorithmX {
 class ConstraintMatrix {
     private:
         int N = 1;
-        const static int ROWS = 6;
-        const static int COLS = 7;
+        const static int ROWS = 729;//729;
+        const static int COLS = 324;//324;
         vector<tuple<int, int, int>> initialNumVecs;
 
     public:
@@ -165,7 +163,7 @@ class ConstraintMatrix {
             vector<array<int, 324>> reducedMat;
             initialNumVecs = used;
             for (auto& vec : initialNumVecs) {
-                int colInd = 81*get<0>(vec) + 9*get<1>(vec) + get<2>(vec);
+                int rowInd = 81*get<0>(vec) + 9*get<1>(vec) + get<2>(vec);
                 int boxInd = (3*floor(get<0>(vec)/3)+floor(get<1>(vec)/3));
                 int cellCons[9], rowCons[9], colCons[9], boxCons[9];
 
@@ -173,10 +171,11 @@ class ConstraintMatrix {
                 int boxColStart = get<1>(vec)-get<1>(vec) % 3;
                 int boxStartInd = 81*boxRowStart + 9*boxColStart;
                 for (int i=0; i<9; i++) {
-                    reducedRowInds.insert(i + colInd-colInd % 9); // Cell cons
+                    reducedRowInds.insert(i + rowInd-rowInd % 9); // Cell cons
                     reducedRowInds.insert(9*i + 81*get<0>(vec) + get<2>(vec)); // Row cons
                     reducedRowInds.insert(81*i + 9*get<1>(vec) + get<2>(vec)); // Col cons
                     reducedRowInds.insert(boxStartInd + 9*(i % 3) + 81*(floor(i/3)) + get<2>(vec)); // Box cons
+                    reducedRowInds.erase(rowInd);
                 }
             }
             for (int i=0; i<fullMatrix.size(); i++) {
@@ -219,52 +218,38 @@ class ConstraintMatrix {
             return sudokuMat;
         }
 
-        Node* toLinkedList() {
-            vector<vector<int>> test = {
-                {1, 0, 0, 1, 0, 0, 1},
-                {1, 0, 0, 1, 0, 0, 0},
-                {0, 0, 0, 1, 1, 0, 1},
-                {0, 0, 1, 0, 1, 1, 0},
-                {0, 1, 1, 0, 0, 1, 1},
-                {0, 1, 0, 0, 0, 0, 1},
-            };
-
-            // int test[ROWS][COLS] = {
-            //     {0, 0, 1, 0, 1, 1, 0},
-            //     {1, 0, 0, 1, 0, 0, 1},
-            //     {0, 1, 1, 0, 0, 1, 0},
-            //     {1, 0, 0, 1, 0, 0, 0},
-            //     {0, 1, 0, 0, 0, 0, 1},
-            //     {0, 0, 0, 1, 1, 0, 1},
-            // };
+        Node* toLinkedList(vector<array<int, 324>> consMat) {
+            int consSetNum = 9 * 9 * 4;
+           // int possibiliesNum = 9 * 9 * 9;
 
             Node* root = new Node();
-            Node* colHeaders[COLS];
-            Node* latestColNodes[COLS];
-            for (int c = 0; c < COLS; ++c) {
+            Node* colHeaders[consSetNum];
+            Node* latestColNodes[consSetNum];
+            for (int c = 0; c < consSetNum; ++c) {
                 colHeaders[c] = new Node(-1, c, nullptr);
                 colHeaders[c]->size += 1;
                 latestColNodes[c] = colHeaders[c];
             }
-            std::vector<Node*> rowNodes = {};
+            vector<Node*> rowNodes = {};
 
             // Init root
             root->right = colHeaders[0];
             colHeaders[0]->left = root;
-            root->left = colHeaders[COLS-1];
-            colHeaders[COLS -1]->right = root;
+            root->left = colHeaders[consSetNum-1];
+            colHeaders[consSetNum -1]->right = root;
+            int size = consMat.size();
 
-            for(int r = -1; r < ROWS; ++r) {
+            for(int r = -1; r < size; ++r) {
                 rowNodes = {};
-                for(int c = 0; c < COLS; ++c) {
-                    if (r == -1 && c < COLS) { // The col header nodes (not actual elements in constraint matrix)
-                        if (c < COLS - 1)  {
+                for(int c = 0; c < consSetNum; ++c) {
+                    if (r == -1 && c < consSetNum) { // The col header nodes (not actual elements in constraint matrix)
+                        if (c < consSetNum - 1)  {
                             colHeaders[c]->right = colHeaders[c+1];
                             colHeaders[c+1]->left = colHeaders[c];
                         }
                         continue;
                     };
-                    if (test[r][c] == 0) continue;
+                    if (consMat[r][c] == 0) continue;
                     Node* n = new Node(r, c, colHeaders[c]);
 
                     if (rowNodes.empty())
@@ -290,24 +275,23 @@ class ConstraintMatrix {
             return root;
         }
 
-        vector<array<int, COLS>> findExactCover() {
-            Node* root = toLinkedList();
+        vector<array<int, COLS>> findExactCover(Node* root, vector<array<int, 324>> unsolved) {
             AlgorithmX alg = AlgorithmX(root);
             alg.search(0);
             vector<array<int, COLS>> subMatrix;
-            for (int r = 0; r < 20; ++r) {
+            for (int r = 0; r < 300; ++r) {
                 if (alg.solution[r].row == -1) break;
                 std::array<int,COLS> tempRow {0};
                 for (int c = 0; c < COLS; ++c){
-                    tempRow[c] = matrix[alg.solution[r].row][c];
+                    tempRow[c] = unsolved[alg.solution[r].row][c];
                 }
                 subMatrix.push_back(tempRow);
             }
-            printMatrix(subMatrix);
+            //printMatrix(subMatrix);
             return subMatrix;
         }
 
-        void printMatrix(vector<array<int, COLS>> mat) {
+        void printMatrix(vector<vector<int>> mat) {
             for (const auto& arr : mat) {
                 for (const auto& element : arr) {
                     std::cout << element << " ";
