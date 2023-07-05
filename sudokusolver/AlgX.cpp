@@ -116,6 +116,7 @@ class ConstraintMatrix {
         int N = 1;
         const static int ROWS = 6;
         const static int COLS = 7;
+        vector<tuple<int, int, int>> initialNumVecs;
 
     public:
         int matrix[ROWS][COLS];
@@ -162,7 +163,8 @@ class ConstraintMatrix {
         const vector<array<int, 324>> reduceMatrix(vector<array<int, 324>> fullMatrix, vector<tuple<int, int, int>> used) {
             set<int> reducedRowInds;
             vector<array<int, 324>> reducedMat;
-            for (auto& vec : used) {
+            initialNumVecs = used;
+            for (auto& vec : initialNumVecs) {
                 int colInd = 81*get<0>(vec) + 9*get<1>(vec) + get<2>(vec);
                 int boxInd = (3*floor(get<0>(vec)/3)+floor(get<1>(vec)/3));
                 int cellCons[9], rowCons[9], colCons[9], boxCons[9];
@@ -196,6 +198,25 @@ class ConstraintMatrix {
             auto& full = fullConstraintMat();
             auto& mat = reduceMatrix(full, numVecs);
             return mat;
+        }
+
+        vector<vector<int>> toSudokuMatrix(vector<array<int, 324>> consMat) {
+            vector<vector<int>> sudokuMat(9, vector<int>(9, 0));
+            for (auto& vec : consMat) {
+                int numVec[3];
+                for (int i=0; i<vec.size(); i++) {
+                    if (vec[i] == 1 && i < 81) {
+                        numVec[0] = floor(i/9);
+                        numVec[1] = i % 9;
+                    }
+                    else if (vec[i] == 1) {
+                        numVec[2] = i % 9; 
+                        sudokuMat[numVec[0]][numVec[1]] = numVec[2] + 1;
+                        break;
+                    }
+                }
+            }
+            return sudokuMat;
         }
 
         Node* toLinkedList() {
@@ -294,4 +315,14 @@ class ConstraintMatrix {
                 std::cout << std::endl;
             }
         }
+        void printArray(int** arr)
+        {
+            for (int i = 0; i < N; ++i) {
+                for (int j = 0; j < N; ++j) {
+                    cout << arr[i][j]<<" ";
+                }
+                cout << endl;
+            }
+        }
+
 };
