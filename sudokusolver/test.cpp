@@ -41,8 +41,5 @@ int main()
     ConstraintMatrix test (testCons);
     vector<tuple<int, int, int>> vec;
     vec.push_back(make_tuple(0, 0, 0));
-    //vec.push_back(make_tuple(0, 1, 2));
-    auto fullMat = test.fullConstraintMat();
-    test.reduceMatrix(fullMat, vec);
- //   test.findExactCover();
+    auto& constMat = test.toConstraintMatrix(sudoku);
 }

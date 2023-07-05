@@ -132,7 +132,7 @@ class ConstraintMatrix {
             }
         }
 
-        vector<array<int, 324>> fullConstraintMat() {
+        const vector<array<int, 324>> fullConstraintMat() {
             vector<array<int, 324>> fullMatrix;
 
             for (int r = 0; r < 9; ++r)
@@ -152,14 +152,14 @@ class ConstraintMatrix {
                         row[242+boxCons] = 1;
                         fullMatrix.push_back(row);
 
-                        char buffer[100];
-                        sprintf(buffer, "%d, %d, %d, %d", cellCons, rowCons, colCons, boxCons);
-                        cout << buffer << endl;
+                        // char buffer[100];
+                        // sprintf(buffer, "%d, %d, %d, %d", cellCons, rowCons, colCons, boxCons);
+                        // cout << buffer << endl;
                     }
             return fullMatrix;
         }
 
-        vector<array<int, 324>> reduceMatrix(vector<array<int, 324>> fullMatrix, vector<tuple<int, int, int>> used) {
+        const vector<array<int, 324>> reduceMatrix(vector<array<int, 324>> fullMatrix, vector<tuple<int, int, int>> used) {
             set<int> reducedRowInds;
             vector<array<int, 324>> reducedMat;
             for (auto& vec : used) {
@@ -178,12 +178,24 @@ class ConstraintMatrix {
                 }
             }
             for (int i=0; i<fullMatrix.size(); i++) {
-                auto contains = reducedRowInds.find(i) != reducedRowInds.end();
-                if (!contains) {
+                bool contains = reducedRowInds.find(i) != reducedRowInds.end();
+                if (!contains)
                     reducedMat.push_back(fullMatrix[i]);
-                }
             }
             return reducedMat;
+        }
+
+        const vector<array<int, 324>> toConstraintMatrix(Sudoku sudoku) {
+            vector<tuple<int, int, int>> numVecs;
+            for (int r=0; r<sudoku.ROWS; r++)
+                for (int c=0; c<sudoku.COLS; c++) {
+                    int value = sudoku.matrix[r][c];
+                    if (value == 0) continue;
+                    numVecs.push_back(tuple<int, int, int>{r, c, value-1});
+                }
+            auto& full = fullConstraintMat();
+            auto& mat = reduceMatrix(full, numVecs);
+            return mat;
         }
 
         Node* toLinkedList() {
