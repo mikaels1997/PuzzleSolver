@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Sudoku.cpp"
+#include "Sudoku.h"
 #include <tuple>
 #include "AlgX.cpp"
 
@@ -20,8 +20,8 @@ int main()
     };
 
     Sudoku sudoku (arr);
-    AlgorithmX algX = AlgorithmX(sudoku.linkedList, sudoku.SIZE);
-    algX.findExactCover(sudoku.linkedList, sudoku.CMat);
+    AlgorithmX algX = AlgorithmX(sudoku.CMat);
+    algX.findExactCover(algX.root, sudoku.CMat);
     auto sol = sudoku.toSudokuMatrix(algX.solutionMat);
     sudoku.printMatrix(sol);
 }

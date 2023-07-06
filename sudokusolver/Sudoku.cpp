@@ -1,4 +1,4 @@
-//#include "Sudoku.h"
+#include "Sudoku.h"
 #include <vector>
 #include <array>
 #include <cmath>
@@ -34,7 +34,6 @@ class Sudoku {
         int numMatrix[SIZE][SIZE];                                  // Sudoku matrix in basic form
         vector<array<int, SIZE*SIZE*4>> fullCMat;      // Non-reduced constraint matrix (empty sudoku)
         vector<array<int, CNS>> CMat;                               // Reduced constraint matrix (initialized sudoku)
-        Node* linkedList;                                           // 4-way circular linked list based on reduced constraint matrix
 
         Sudoku(int mat[SIZE][SIZE]) {
             for(int r = 0; r < SIZE; ++r) {
@@ -43,7 +42,6 @@ class Sudoku {
             }
             fullCMat = fullConstraintMat();
             CMat = toConstraintMatrix();
-            linkedList = toLinkedList(CMat);
         }
 
         vector<array<int, CNS>> fullConstraintMat() {
@@ -106,60 +104,6 @@ class Sudoku {
                 }
             auto mat = reduceMatrix(fullCMat, numVecs);
             return mat;
-        }
-
-        Node* toLinkedList(vector<array<int, CNS>> consMat) {
-            Node* root = new Node();
-            Node* colHeaders[CNS];
-            Node* latestColNodes[CNS];
-            for (int c = 0; c < CNS; ++c) {
-                colHeaders[c] = new Node(-1, c, nullptr);
-                colHeaders[c]->size += 1;
-                latestColNodes[c] = colHeaders[c];
-            }
-            vector<Node*> rowNodes = {};
-
-            // Init root
-            root->right = colHeaders[0];
-            colHeaders[0]->left = root;
-            root->left = colHeaders[CNS-1];
-            colHeaders[CNS -1]->right = root;
-            int size = consMat.size();
-
-            for(int r = -1; r < size; ++r) {
-                rowNodes = {};
-                for(int c = 0; c < CNS; ++c) {
-                    if (r == -1 && c < CNS) { // The col header nodes (not actual elements in constraint numMatrix)
-                        if (c < CNS - 1)  {
-                            colHeaders[c]->right = colHeaders[c+1];
-                            colHeaders[c+1]->left = colHeaders[c];
-                        }
-                        continue;
-                    };
-                    if (consMat[r][c] == 0) continue;
-                    Node* n = new Node(r, c, colHeaders[c]);
-
-                    if (rowNodes.empty())
-                        rowNodes.push_back(n);
-
-                    n->left = rowNodes.back();
-                    rowNodes.back()->right = n;
-                    n->right = rowNodes.front();
-                    rowNodes.front()->left = n;
-
-                    n->top = latestColNodes[c];
-                    latestColNodes[c]->bottom = n;
-
-                    n->bottom = colHeaders[c];
-                    colHeaders[c]->top = n;
-
-                    latestColNodes[c] = n;
-                    rowNodes.push_back(n);
-
-                    n->colHeader->size += 1;
-                }
-            }
-            return root;
         }
 
         vector<vector<int>> toSudokuMatrix(vector<array<int, CNS>> consMat) {

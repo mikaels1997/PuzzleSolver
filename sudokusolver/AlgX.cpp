@@ -1,5 +1,5 @@
 #include "AlgX.h"
-#include "Sudoku.h"
+#include "Sudoku.cpp"
 #include <vector>
 #include <array>
 #include <cmath>
@@ -11,28 +11,28 @@
 class AlgorithmX {
     private:
         Node* colHeader;
-        Node* root;
-        Node* solution[81];
+        Node* solution[Sudoku::CLS];
     public:
-        vector<array<int, 324>> solutionMat;
+        vector<array<int, Sudoku::CNS>> solutionMat;
+        Node* root;
 
-        AlgorithmX(Node* r, int size) {
-            root = r;
-            colHeader = r;
+        AlgorithmX(vector<array<int, Sudoku::CNS>> cMat) {
+            root = toLinkedList(cMat);
+            colHeader = root;
         };
 
-        void findExactCover(Node* root, vector<array<int, 324>> unsolved) {
+        void findExactCover(Node* root, vector<array<int, Sudoku::CNS>> unsolved) {
             root = root;
             colHeader = root;
             search(0, unsolved);
         }
 
-        void search(int k, vector<array<int, 324>> unsolved) {
+        void search(int k, vector<array<int, Sudoku::CNS>> unsolved) {
             if (root->right == root) {
-                vector<array<int, 324>> subMatrix;
-                for (int r = 0; r < 81; ++r) {
-                    std::array<int,324> tempRow {0};
-                    for (int c = 0; c < 324; ++c)
+                vector<array<int, Sudoku::CNS>> subMatrix;
+                for (int r = 0; r < Sudoku::CLS; ++r) {
+                    std::array<int,Sudoku::CNS> tempRow {0};
+                    for (int c = 0; c < Sudoku::CNS; ++c)
                         tempRow[c] = unsolved[solution[r]->row][c];
                     subMatrix.push_back(tempRow);
                 }
@@ -90,5 +90,59 @@ class AlgorithmX {
                 if (t->size < chosenCol->size)
                     chosenCol = t;
             return chosenCol;
+        }
+
+        Node* toLinkedList(vector<array<int, Sudoku::CNS>> consMat) {
+            Node* root = new Node();
+            Node* colHeaders[Sudoku::CNS];
+            Node* latestColNodes[Sudoku::CNS];
+            for (int c = 0; c < Sudoku::CNS; ++c) {
+                colHeaders[c] = new Node(-1, c, nullptr);
+                colHeaders[c]->size += 1;
+                latestColNodes[c] = colHeaders[c];
+            }
+            vector<Node*> rowNodes = {};
+
+            // Init root
+            root->right = colHeaders[0];
+            colHeaders[0]->left = root;
+            root->left = colHeaders[Sudoku::CNS-1];
+            colHeaders[Sudoku::CNS -1]->right = root;
+            int size = consMat.size();
+
+            for(int r = -1; r < size; ++r) {
+                rowNodes = {};
+                for(int c = 0; c < Sudoku::CNS; ++c) {
+                    if (r == -1 && c < Sudoku::CNS) { // The col header nodes (not actual elements in constraint numMatrix)
+                        if (c < Sudoku::CNS - 1)  {
+                            colHeaders[c]->right = colHeaders[c+1];
+                            colHeaders[c+1]->left = colHeaders[c];
+                        }
+                        continue;
+                    };
+                    if (consMat[r][c] == 0) continue;
+                    Node* n = new Node(r, c, colHeaders[c]);
+
+                    if (rowNodes.empty())
+                        rowNodes.push_back(n);
+
+                    n->left = rowNodes.back();
+                    rowNodes.back()->right = n;
+                    n->right = rowNodes.front();
+                    rowNodes.front()->left = n;
+
+                    n->top = latestColNodes[c];
+                    latestColNodes[c]->bottom = n;
+
+                    n->bottom = colHeaders[c];
+                    colHeaders[c]->top = n;
+
+                    latestColNodes[c] = n;
+                    rowNodes.push_back(n);
+
+                    n->colHeader->size += 1;
+                }
+            }
+            return root;
         }
 };
