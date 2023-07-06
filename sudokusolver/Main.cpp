@@ -20,9 +20,6 @@ int main()
     };
 
     Sudoku sudoku (arr);
-    ConstraintMatrix consMatrix (sudoku);
-    auto constMat = consMatrix.toConstraintMatrix(sudoku);
-    auto linkedList = consMatrix.toLinkedList(constMat);
-    AlgorithmX algX = AlgorithmX(linkedList);
-    algX.findExactCover(linkedList, constMat);
+    AlgorithmX algX = AlgorithmX(sudoku.linkedList);
+    algX.findExactCover(sudoku.linkedList, sudoku.CMat);
 }

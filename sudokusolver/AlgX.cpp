@@ -1,4 +1,4 @@
-#include "AlgX.h"
+//#include "AlgX.h"
 #include "Sudoku.h"
 #include <vector>
 #include <array>
@@ -7,21 +7,6 @@
 #include <numeric>
 #include <set>
 #include <algorithm>
-
-struct Node {
-    public:
-        Node* top;
-        Node* right;
-        Node* bottom;
-        Node* left;
-        int row = -1; // y coordinate
-        int col = -1; // x coordinate
-        int size = -1;
-        Node* colHeader;
-
-        Node() {};
-        Node(int r, int c, Node* h) : row(r), col(c), colHeader(h != NULL ? h : this) {}
-};
 
 class AlgorithmX {
     private:
@@ -132,148 +117,5 @@ class AlgorithmX {
                 }
                 std::cout << std::endl;
             }
-        }
-};
-
-class ConstraintMatrix {
-    private:
-        int N = 1;
-        const static int ROWS = 729;//729;
-        const static int COLS = 324;//324;
-        vector<tuple<int, int, int>> initialNumVecs;
-
-    public:
-        int numMatrix[ROWS][COLS];
-        ConstraintMatrix(Sudoku sudoku) {
-            for(int r = 0; r < Sudoku::ROWS; ++r) {
-                for(int c = 0; c < Sudoku::COLS; ++c) {}
-            }
-        }
-        ConstraintMatrix(int mat[ROWS][COLS]) {
-            for(int r = 0; r < ROWS; ++r) {
-                for(int c = 0; c < COLS; ++c) 
-                    numMatrix[r][c] = mat[r][c];
-            }
-        }
-
-        const vector<array<int, 324>> fullConstraintMat() {
-            vector<array<int, 324>> fullMatrix;
-
-            for (int r = 0; r < 9; ++r)
-                for (int c = 0; c < 9; ++c)
-                    for (int v = 1; v < 10; ++v) {
-                        array<int, 324> row {0};
-                        int i = 81 *r + 9*c + v - 1;
-
-                        int cellCons = 9*r + c;
-                        int rowCons = 9*r + v;
-                        int colCons = 9*c + v;
-                        int boxCons = 9*((3*floor(r/3) + 1) + floor(c/3) - 1) + v;
-
-                        row[cellCons] = 1;
-                        row[80+rowCons] = 1;
-                        row[161+colCons] = 1;
-                        row[242+boxCons] = 1;
-                        fullMatrix.push_back(row);
-                    }
-            return fullMatrix;
-        }
-
-        const vector<array<int, 324>> reduceMatrix(vector<array<int, 324>> fullMatrix, vector<tuple<int, int, int>> used) {
-            set<int> reducedRowInds;
-            vector<array<int, 324>> reducedMat;
-            initialNumVecs = used;
-            for (auto& vec : initialNumVecs) {
-                int rowInd = 81*get<0>(vec) + 9*get<1>(vec) + get<2>(vec);
-                int boxInd = (3*floor(get<0>(vec)/3)+floor(get<1>(vec)/3));
-                int cellCons[9], rowCons[9], colCons[9], boxCons[9];
-
-                int boxRowStart = get<0>(vec)-get<0>(vec) % 3;
-                int boxColStart = get<1>(vec)-get<1>(vec) % 3;
-                int boxStartInd = 81*boxRowStart + 9*boxColStart;
-                for (int i=0; i<9; i++) {
-                    reducedRowInds.insert(i + rowInd-rowInd % 9); // Cell cons
-                    reducedRowInds.insert(9*i + 81*get<0>(vec) + get<2>(vec)); // Row cons
-                    reducedRowInds.insert(81*i + 9*get<1>(vec) + get<2>(vec)); // Col cons
-                    reducedRowInds.insert(boxStartInd + 9*(i % 3) + 81*(floor(i/3)) + get<2>(vec)); // Box cons
-                    reducedRowInds.erase(rowInd);
-                }
-            }
-            for (int i=0; i<fullMatrix.size(); i++) {
-                bool contains = reducedRowInds.find(i) != reducedRowInds.end();
-                if (!contains)
-                    reducedMat.push_back(fullMatrix[i]);
-            }
-            return reducedMat;
-        }
-
-        const vector<array<int, 324>> toConstraintMatrix(Sudoku sudoku) {
-            vector<tuple<int, int, int>> numVecs;
-            for (int r=0; r<sudoku.ROWS; r++)
-                for (int c=0; c<sudoku.COLS; c++) {
-                    int value = sudoku.numMatrix[r][c];
-                    if (value == 0) continue;
-                    numVecs.push_back(tuple<int, int, int>{r, c, value-1});
-                }
-            auto& full = fullConstraintMat();
-            auto& mat = reduceMatrix(full, numVecs);
-            return mat;
-        }
-
-        Node* toLinkedList(vector<array<int, 324>> consMat) {
-            int consSetNum = 9 * 9 * 4;
-           // int possibiliesNum = 9 * 9 * 9;
-
-            Node* root = new Node();
-            Node* colHeaders[consSetNum];
-            Node* latestColNodes[consSetNum];
-            for (int c = 0; c < consSetNum; ++c) {
-                colHeaders[c] = new Node(-1, c, nullptr);
-                colHeaders[c]->size += 1;
-                latestColNodes[c] = colHeaders[c];
-            }
-            vector<Node*> rowNodes = {};
-
-            // Init root
-            root->right = colHeaders[0];
-            colHeaders[0]->left = root;
-            root->left = colHeaders[consSetNum-1];
-            colHeaders[consSetNum -1]->right = root;
-            int size = consMat.size();
-
-            for(int r = -1; r < size; ++r) {
-                rowNodes = {};
-                for(int c = 0; c < consSetNum; ++c) {
-                    if (r == -1 && c < consSetNum) { // The col header nodes (not actual elements in constraint numMatrix)
-                        if (c < consSetNum - 1)  {
-                            colHeaders[c]->right = colHeaders[c+1];
-                            colHeaders[c+1]->left = colHeaders[c];
-                        }
-                        continue;
-                    };
-                    if (consMat[r][c] == 0) continue;
-                    Node* n = new Node(r, c, colHeaders[c]);
-
-                    if (rowNodes.empty())
-                        rowNodes.push_back(n);
-
-                    n->left = rowNodes.back();
-                    rowNodes.back()->right = n;
-                    n->right = rowNodes.front();
-                    rowNodes.front()->left = n;
-
-                    n->top = latestColNodes[c];
-                    latestColNodes[c]->bottom = n;
-
-                    n->bottom = colHeaders[c];
-                    colHeaders[c]->top = n;
-
-                    latestColNodes[c] = n;
-                    rowNodes.push_back(n);
-
-                    n->colHeader->size += 1;
-                }
-            }
-            return root;
         }
 };

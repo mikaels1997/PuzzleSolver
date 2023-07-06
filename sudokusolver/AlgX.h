@@ -1,22 +1,9 @@
 #ifdef ALGX_H
 #define ALGX_H
 
-class ConstraintMatrix {
+class AlgorithmX {
     public:
-        int[][324] mat;
-        ConstraintMatrix();
-};
-
-struct Node {
-    public:
-        int value;
-        Node* colHeader;
-        Node* top;
-        Node* right;
-        Node* bottom;
-        Node* left;
-
-        Node(int v) {}
-};
+        void search(int k, vector<array<int, 324>> unsolved);
+}
 
 #endif
