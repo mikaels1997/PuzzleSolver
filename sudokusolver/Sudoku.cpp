@@ -27,14 +27,14 @@ struct Node {
 
 class Sudoku {
     public:
-        const static int SIZE = 9;                      // Side length of the sudoku
-        const static int CLS = SIZE * SIZE;             // Number of cells in the sudoku
-        const static int CNS = SIZE * SIZE * 4;         // Number of constraint sets: 9*9*4
+        const static int SIZE = 9;                                  // Side length of the sudoku
+        const static int CLS = SIZE * SIZE;                         // Number of cells in the sudoku
+        const static int CNS = SIZE * SIZE * 4;                     // Number of constraint sets: 9*9*4
 
-        int numMatrix[SIZE][SIZE];                      // Sudoku matrix in basic form
-        vector<array<int, SIZE*SIZE*4>> fullCMat;       // Non-reduced constraint matrix (empty sudoku)
-        vector<array<int, CNS>> CMat;                   // Reduced constraint matrix (initialized sudoku)
-        Node* linkedList;                               // 4-way circular linked list
+        int numMatrix[SIZE][SIZE];                                  // Sudoku matrix in basic form
+        vector<array<int, SIZE*SIZE*4>> fullCMat;      // Non-reduced constraint matrix (empty sudoku)
+        vector<array<int, CNS>> CMat;                               // Reduced constraint matrix (initialized sudoku)
+        Node* linkedList;                                           // 4-way circular linked list based on reduced constraint matrix
 
         Sudoku(int mat[SIZE][SIZE]) {
             for(int r = 0; r < SIZE; ++r) {
@@ -46,7 +46,7 @@ class Sudoku {
             linkedList = toLinkedList(CMat);
         }
 
-        const vector<array<int, CNS>> fullConstraintMat() {
+        vector<array<int, CNS>> fullConstraintMat() {
             vector<array<int, CNS>> fullMatrix;
 
             for (int r = 0; r < SIZE; ++r)
@@ -160,5 +160,32 @@ class Sudoku {
                 }
             }
             return root;
+        }
+
+        vector<vector<int>> toSudokuMatrix(vector<array<int, CNS>> consMat) {
+            vector<vector<int>> sudokuMat(SIZE, vector<int>(SIZE, 0));
+            for (auto& vec : consMat) {
+                int numVec[3];
+                for (int i=0; i<vec.size(); i++) {
+                    if (vec[i] == 1 && i < CLS) {
+                        numVec[0] = floor(i/SIZE);
+                        numVec[1] = i % SIZE;
+                    }
+                    else if (vec[i] == 1) {
+                        numVec[2] = i % SIZE; 
+                        sudokuMat[numVec[0]][numVec[1]] = numVec[2] + 1;
+                        break;
+                    }
+                }
+            }
+            return sudokuMat;
+        }
+        void printMatrix(vector<vector<int>> mat) {
+            for (const auto& arr : mat) {
+                for (const auto& element : arr) {
+                    std::cout << element << " ";
+                }
+                std::cout << std::endl;
+            }
         }
 };

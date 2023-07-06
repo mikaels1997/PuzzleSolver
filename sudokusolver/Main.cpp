@@ -20,6 +20,8 @@ int main()
     };
 
     Sudoku sudoku (arr);
-    AlgorithmX algX = AlgorithmX(sudoku.linkedList);
+    AlgorithmX algX = AlgorithmX(sudoku.linkedList, sudoku.SIZE);
     algX.findExactCover(sudoku.linkedList, sudoku.CMat);
+    auto sol = sudoku.toSudokuMatrix(algX.solutionMat);
+    sudoku.printMatrix(sol);
 }

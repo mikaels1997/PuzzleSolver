@@ -1,4 +1,4 @@
-//#include "AlgX.h"
+#include "AlgX.h"
 #include "Sudoku.h"
 #include <vector>
 #include <array>
@@ -12,9 +12,11 @@ class AlgorithmX {
     private:
         Node* colHeader;
         Node* root;
-    public:
         Node* solution[81];
-        AlgorithmX(Node* r) {
+    public:
+        vector<array<int, 324>> solutionMat;
+
+        AlgorithmX(Node* r, int size) {
             root = r;
             colHeader = r;
         };
@@ -34,8 +36,7 @@ class AlgorithmX {
                         tempRow[c] = unsolved[solution[r]->row][c];
                     subMatrix.push_back(tempRow);
                 }
-                auto solvedSudoku = toSudokuMatrix(subMatrix);
-                printMatrix(solvedSudoku);
+                solutionMat = subMatrix;
                 return;
             };
             colHeader = chooseColumn(root);
@@ -89,33 +90,5 @@ class AlgorithmX {
                 if (t->size < chosenCol->size)
                     chosenCol = t;
             return chosenCol;
-        }
-
-        vector<vector<int>> toSudokuMatrix(vector<array<int, 324>> consMat) {
-            vector<vector<int>> sudokuMat(9, vector<int>(9, 0));
-            for (auto& vec : consMat) {
-                int numVec[3];
-                for (int i=0; i<vec.size(); i++) {
-                    if (vec[i] == 1 && i < 81) {
-                        numVec[0] = floor(i/9);
-                        numVec[1] = i % 9;
-                    }
-                    else if (vec[i] == 1) {
-                        numVec[2] = i % 9; 
-                        sudokuMat[numVec[0]][numVec[1]] = numVec[2] + 1;
-                        break;
-                    }
-                }
-            }
-            return sudokuMat;
-        }
-        
-        void printMatrix(vector<vector<int>> mat) {
-            for (const auto& arr : mat) {
-                for (const auto& element : arr) {
-                    std::cout << element << " ";
-                }
-                std::cout << std::endl;
-            }
         }
 };

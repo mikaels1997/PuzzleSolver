@@ -3,6 +3,9 @@
 
 class AlgorithmX {
     public:
+        /// @brief Testi
+        /// @param k 
+        /// @param unsolved 
         void search(int k, vector<array<int, 324>> unsolved);
 }
 
