@@ -143,7 +143,7 @@ class ConstraintMatrix {
         vector<tuple<int, int, int>> initialNumVecs;
 
     public:
-        int matrix[ROWS][COLS];
+        int numMatrix[ROWS][COLS];
         ConstraintMatrix(Sudoku sudoku) {
             for(int r = 0; r < Sudoku::ROWS; ++r) {
                 for(int c = 0; c < Sudoku::COLS; ++c) {}
@@ -152,7 +152,7 @@ class ConstraintMatrix {
         ConstraintMatrix(int mat[ROWS][COLS]) {
             for(int r = 0; r < ROWS; ++r) {
                 for(int c = 0; c < COLS; ++c) 
-                    matrix[r][c] = mat[r][c];
+                    numMatrix[r][c] = mat[r][c];
             }
         }
 
@@ -211,7 +211,7 @@ class ConstraintMatrix {
             vector<tuple<int, int, int>> numVecs;
             for (int r=0; r<sudoku.ROWS; r++)
                 for (int c=0; c<sudoku.COLS; c++) {
-                    int value = sudoku.matrix[r][c];
+                    int value = sudoku.numMatrix[r][c];
                     if (value == 0) continue;
                     numVecs.push_back(tuple<int, int, int>{r, c, value-1});
                 }
@@ -244,7 +244,7 @@ class ConstraintMatrix {
             for(int r = -1; r < size; ++r) {
                 rowNodes = {};
                 for(int c = 0; c < consSetNum; ++c) {
-                    if (r == -1 && c < consSetNum) { // The col header nodes (not actual elements in constraint matrix)
+                    if (r == -1 && c < consSetNum) { // The col header nodes (not actual elements in constraint numMatrix)
                         if (c < consSetNum - 1)  {
                             colHeaders[c]->right = colHeaders[c+1];
                             colHeaders[c+1]->left = colHeaders[c];
