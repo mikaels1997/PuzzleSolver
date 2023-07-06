@@ -6,6 +6,7 @@
 #include <stack>
 #include <numeric>
 #include <set>
+#include <algorithm>
 
 struct Node {
     public:
@@ -27,85 +28,110 @@ class AlgorithmX {
         Node* colHeader;
         Node* root;
     public:
-        Node solution[1000];
+        Node* solution[81];
         AlgorithmX(Node* r) {
             root = r;
             colHeader = r;
         };
 
-        void search(int k) {
+        void findExactCover(Node* root, vector<array<int, 324>> unsolved) {
+            root = root;
+            colHeader = root;
+            search(0, unsolved);
+        }
+
+        void search(int k, vector<array<int, 324>> unsolved) {
             if (root->right == root) {
+                vector<array<int, 324>> subMatrix;
+                for (int r = 0; r < 81; ++r) {
+                    std::array<int,324> tempRow {0};
+                    for (int c = 0; c < 324; ++c)
+                        tempRow[c] = unsolved[solution[r]->row][c];
+                    subMatrix.push_back(tempRow);
+                }
+                auto solvedSudoku = toSudokuMatrix(subMatrix);
+                printMatrix(solvedSudoku);
                 return;
             };
             colHeader = chooseColumn(root);
+
             coverColumn(colHeader);
 
-            Node *r = colHeader->bottom;
-            while (r != colHeader) {
-                solution[k] = *r;
-                Node* j = r->right;
-                while(j != r) {
-                    coverColumn(j->colHeader);
-                    j = j->right;
+            for (Node* temp = colHeader->bottom; temp != colHeader; temp = temp->bottom) {
+                solution[k] = temp;
+                for (Node* node = temp->right; node != temp; node = node->right) {
+                    coverColumn(node->colHeader);
                 }
-                search(k + 1);
-                r = &solution[k];
-                colHeader = r->colHeader;
-                j = r->left;
-                while (j->col != r->col) {
-                    uncoverColumn(j->colHeader);
-                    j = j->left;
+
+                search(k + 1, unsolved);
+
+                temp = solution[k];
+                colHeader = temp->colHeader;
+                for (Node* node = temp->left; node != temp; node = node->left) {
+                    uncoverColumn(node->colHeader);
                 }
-                r = r->bottom;
             }
             uncoverColumn(colHeader);
-            return;
         }
 
         void coverColumn(Node* c) {
             c->right->left = c->left;
             c->left->right = c->right;
-            Node* i = c->bottom;
-            while (i != c) {
-                Node *j = i->right;
-                while (j != i) {
-                    j->bottom->top = j->top;
-                    j->top->bottom = j->bottom;
-                    j->colHeader->size -= 1;
-                    j = j->right;
+            for (Node* rowNode = c->bottom; rowNode != c; rowNode = rowNode->bottom) {
+                for (Node* colNode = rowNode->right; colNode != rowNode; colNode = colNode->right) {
+                    colNode->bottom->top = colNode->top;
+                    colNode->top->bottom = colNode->bottom;
+                    colNode->colHeader->size--;
                 }
-                i = i->bottom;
             }
         }
 
         void uncoverColumn(Node* c) {
-            Node *i = c->top;
-            while (i != c) {
-                Node *j = i->left;
-                while(j != i) {
-                    j->colHeader->size += 1;
-                    j->bottom->top = j;
-                    j->top->bottom = j;
-                    j = j->left;
+            for (Node* rowNode = c->top; rowNode != c; rowNode = rowNode->top) {
+                for (Node* colNode = rowNode->left; colNode != rowNode; colNode = colNode->left) {
+                    colNode->colHeader->size++;
+                    colNode->bottom->top = colNode;
+                    colNode->top->bottom = colNode;
                 }
-                i = i->top;
             }
             c->right->left = c;
             c->left->right = c;
         }
 
         Node* chooseColumn(Node* root) {
-            Node* temp = root->right;
-            int minSize = 10000;
-            Node* chosenCol;
-            while(temp != root) {
-                if (temp->size < minSize && temp->size >= 0) {
-                    chosenCol = temp;
-                    minSize = temp->size;
-                }
-                temp = temp->right;
-            }
+            Node* chosenCol = root->right;
+            for (Node* t = chosenCol->right; t != root; t = t->right)
+                if (t->size < chosenCol->size)
+                    chosenCol = t;
             return chosenCol;
+        }
+
+        vector<vector<int>> toSudokuMatrix(vector<array<int, 324>> consMat) {
+            vector<vector<int>> sudokuMat(9, vector<int>(9, 0));
+            for (auto& vec : consMat) {
+                int numVec[3];
+                for (int i=0; i<vec.size(); i++) {
+                    if (vec[i] == 1 && i < 81) {
+                        numVec[0] = floor(i/9);
+                        numVec[1] = i % 9;
+                    }
+                    else if (vec[i] == 1) {
+                        numVec[2] = i % 9; 
+                        sudokuMat[numVec[0]][numVec[1]] = numVec[2] + 1;
+                        break;
+                    }
+                }
+            }
+            return sudokuMat;
+        }
+        
+        void printMatrix(vector<vector<int>> mat) {
+            for (const auto& arr : mat) {
+                for (const auto& element : arr) {
+                    std::cout << element << " ";
+                }
+                std::cout << std::endl;
+            }
         }
 };
 
@@ -120,8 +146,7 @@ class ConstraintMatrix {
         int matrix[ROWS][COLS];
         ConstraintMatrix(Sudoku sudoku) {
             for(int r = 0; r < Sudoku::ROWS; ++r) {
-                for(int c = 0; c < Sudoku::COLS; ++c) 
-                    std::cout << "Hello World" << std::endl;
+                for(int c = 0; c < Sudoku::COLS; ++c) {}
             }
         }
         ConstraintMatrix(int mat[ROWS][COLS]) {
@@ -150,10 +175,6 @@ class ConstraintMatrix {
                         row[161+colCons] = 1;
                         row[242+boxCons] = 1;
                         fullMatrix.push_back(row);
-
-                        // char buffer[100];
-                        // sprintf(buffer, "%d, %d, %d, %d", cellCons, rowCons, colCons, boxCons);
-                        // cout << buffer << endl;
                     }
             return fullMatrix;
         }
@@ -197,25 +218,6 @@ class ConstraintMatrix {
             auto& full = fullConstraintMat();
             auto& mat = reduceMatrix(full, numVecs);
             return mat;
-        }
-
-        vector<vector<int>> toSudokuMatrix(vector<array<int, 324>> consMat) {
-            vector<vector<int>> sudokuMat(9, vector<int>(9, 0));
-            for (auto& vec : consMat) {
-                int numVec[3];
-                for (int i=0; i<vec.size(); i++) {
-                    if (vec[i] == 1 && i < 81) {
-                        numVec[0] = floor(i/9);
-                        numVec[1] = i % 9;
-                    }
-                    else if (vec[i] == 1) {
-                        numVec[2] = i % 9; 
-                        sudokuMat[numVec[0]][numVec[1]] = numVec[2] + 1;
-                        break;
-                    }
-                }
-            }
-            return sudokuMat;
         }
 
         Node* toLinkedList(vector<array<int, 324>> consMat) {
@@ -274,39 +276,4 @@ class ConstraintMatrix {
             }
             return root;
         }
-
-        vector<array<int, COLS>> findExactCover(Node* root, vector<array<int, 324>> unsolved) {
-            AlgorithmX alg = AlgorithmX(root);
-            alg.search(0);
-            vector<array<int, COLS>> subMatrix;
-            for (int r = 0; r < 300; ++r) {
-                if (alg.solution[r].row == -1) break;
-                std::array<int,COLS> tempRow {0};
-                for (int c = 0; c < COLS; ++c){
-                    tempRow[c] = unsolved[alg.solution[r].row][c];
-                }
-                subMatrix.push_back(tempRow);
-            }
-            //printMatrix(subMatrix);
-            return subMatrix;
-        }
-
-        void printMatrix(vector<vector<int>> mat) {
-            for (const auto& arr : mat) {
-                for (const auto& element : arr) {
-                    std::cout << element << " ";
-                }
-                std::cout << std::endl;
-            }
-        }
-        void printArray(int** arr)
-        {
-            for (int i = 0; i < N; ++i) {
-                for (int j = 0; j < N; ++j) {
-                    cout << arr[i][j]<<" ";
-                }
-                cout << endl;
-            }
-        }
-
 };
