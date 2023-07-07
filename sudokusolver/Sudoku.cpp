@@ -1,4 +1,5 @@
 #include "Sudoku.h"
+#include <iostream>
 #include <vector>
 #include <array>
 #include <cmath>
