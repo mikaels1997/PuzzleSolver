@@ -11,7 +11,7 @@ using namespace std;
 Sudoku::Sudoku(int mat[SIZE][SIZE]) {
     for(int r = 0; r < SIZE; ++r) {
         for(int c = 0; c < SIZE; ++c) 
-            numMatrix[r][c] = mat[r][c];
+            unsolvedSudokuMat[r][c] = mat[r][c];
     }
     fullCMat = fullConstraintMat();
     CMat = toConstraintMatrix();
@@ -32,31 +32,31 @@ vector<array<int, Sudoku::CNS>> Sudoku::fullConstraintMat() {
                 int boxCons = SIZE*((3*floor(r/3) + 1) + floor(c/3) - 1) + v;
 
                 row[cellCons] = 1;
-                row[80+rowCons] = 1;
-                row[161+colCons] = 1;
-                row[242+boxCons] = 1;
+                row[CLS-1+rowCons] = 1;
+                row[2*CLS-1+colCons] = 1;
+                row[3*CLS-1+boxCons] = 1;
                 fullMatrix.push_back(row);
             }
     return fullMatrix;
 }
 
-const vector<array<int, Sudoku::CNS>> Sudoku::reduceMatrix(vector<array<int, Sudoku::CNS>> fullMatrix, vector<tuple<int, int, int>> used) {
-    set<int> reducedRowInds;
-    vector<array<int, CNS>> reducedMat;
-    for (tuple<int, int, int> vec : used) {
-        int rowInd = CLS*get<0>(vec) + SIZE*get<1>(vec) + get<2>(vec);
+const vector<array<int, Sudoku::CNS>> Sudoku::reduceMatrix(vector<array<int, Sudoku::CNS>> fullMatrix, vector<tuple<int, int, int>> occupied) {
+    set<int> reducedRowInds;                                                // Row indexes to exclude in constraint matrix
+    vector<array<int, CNS>> reducedMat;                                     // Reduced constraint matrix
+    for (tuple<int, int, int> vec : occupied) {
+        int rowInd = CLS*get<0>(vec) + SIZE*get<1>(vec) + get<2>(vec);      // Row index of the 
         int boxInd = (3*floor(get<0>(vec)/3)+floor(get<1>(vec)/3));
         int cellCons[SIZE], rowCons[SIZE], colCons[SIZE], boxCons[SIZE];
 
-        int boxRowStart = get<0>(vec)-get<0>(vec) % 3;
-        int boxColStart = get<1>(vec)-get<1>(vec) % 3;
-        int boxStartInd = 81*boxRowStart + 9*boxColStart;
+        int boxRowStart = get<0>(vec)-get<0>(vec) % 3;      // Row index of a box
+        int boxColStart = get<1>(vec)-get<1>(vec) % 3;      // Col index of a box
+        int boxStartInd = 81*boxRowStart + 9*boxColStart;   // First row index of that box within full constraint matrix
         for (int i=0; i<9; i++) {
-            reducedRowInds.insert(i + rowInd-rowInd % SIZE); // Cell cons
-            reducedRowInds.insert(SIZE*i + CLS*get<0>(vec) + get<2>(vec)); // Row cons
-            reducedRowInds.insert(CLS*i + SIZE*get<1>(vec) + get<2>(vec)); // Col cons
-            reducedRowInds.insert(boxStartInd + SIZE*(i % 3) + CLS*(floor(i/3)) + get<2>(vec)); // Box cons
-            reducedRowInds.erase(rowInd);
+            reducedRowInds.insert(i + rowInd-rowInd % SIZE);                                    // Cell constraints
+            reducedRowInds.insert(SIZE*i + CLS*get<0>(vec) + get<2>(vec));                      // Row constraints
+            reducedRowInds.insert(CLS*i + SIZE*get<1>(vec) + get<2>(vec));                      // Col constraints
+            reducedRowInds.insert(boxStartInd + SIZE*(i % 3) + CLS*(floor(i/3)) + get<2>(vec)); // Box constraints
+            reducedRowInds.erase(rowInd);                                                       // Not including the occupied 
         }
     }
     for (int i=0; i<fullMatrix.size(); i++) {
@@ -71,7 +71,7 @@ const vector<array<int, Sudoku::CNS>> Sudoku::toConstraintMatrix() {
     vector<tuple<int, int, int>> numVecs;
     for (int r=0; r<SIZE; r++)
         for (int c=0; c<SIZE; c++) {
-            int value = numMatrix[r][c];
+            int value = unsolvedSudokuMat[r][c];
             if (value == 0) continue;
             numVecs.push_back(tuple<int, int, int>{r, c, value-1});
         }

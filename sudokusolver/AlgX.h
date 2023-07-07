@@ -34,16 +34,30 @@ class AlgorithmX {
 
         AlgorithmX(std::vector<std::array<int, Sudoku::CNS>> cMat);
 
+        /// @brief Finds solution to exact cover problem
+        /// @param root Root of the linked list
         void findExactCover(Node* root);
 
+        /// @brief Recursive depth-first search of Algorithm X
+        /// @param k Current depth
         void search(int k);
 
+        /// @brief Covers column as part of Algorithm X
+        /// @param c The header of the column to be covered
         void coverColumn(Node* c);
 
+        /// @brief Uncovers column as part of Algorithm X
+        /// @param c The header of the column to be uncovered 
         void uncoverColumn(Node* c);
 
+        /// @brief Chooses the column with least size
+        /// @param root Root node of linked list
+        /// @return The column header with least size
         Node* chooseColumn(Node* root);
 
+        /// @brief Converts constraint matrix to linked list
+        /// @param consMat Initialized constraint matrix of a sudoku
+        /// @return 4 way circular linked list of an initialized sudoku with additional header nodes  
         Node* toLinkedList(std::vector<std::array<int, Sudoku::CNS>> consMat);
 };
 

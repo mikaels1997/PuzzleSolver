@@ -12,20 +12,15 @@ AlgorithmX::AlgorithmX(vector<array<int, Sudoku::CNS>> cMat) {
     root = toLinkedList(cMat);
 };
 
-/// @brief Finds solution to exact cover problem
-/// @param root Root of the linked list
-/// @param unsolved 
 void AlgorithmX::findExactCover(Node* root) {
     root = root;
     colHeader = root;
     search(0);
 }
 
-/// @brief Recursive depth-first search of Algorithm X
-/// @param k Current depth
-/// @param unsolved 
 void AlgorithmX::search(int k) {
     if (root->right == root) {
+        // Solution found !
         vector<array<int, Sudoku::CNS>> subMatrix;
         for (int r = 0; r < Sudoku::CLS; ++r) {
             std::array<int,Sudoku::CNS> tempRow {0};
@@ -45,9 +40,7 @@ void AlgorithmX::search(int k) {
         for (Node* node = temp->right; node != temp; node = node->right) {
             coverColumn(node->colHeader);
         }
-
         search(k + 1);
-
         temp = solution[k];
         colHeader = temp->colHeader;
         for (Node* node = temp->left; node != temp; node = node->left) {
@@ -57,8 +50,6 @@ void AlgorithmX::search(int k) {
     uncoverColumn(colHeader);
 }
 
-/// @brief Covers column as part of Algorithm X
-/// @param c The header of the column to be covered
 void AlgorithmX::coverColumn(Node* c) {
     c->right->left = c->left;
     c->left->right = c->right;
@@ -71,8 +62,6 @@ void AlgorithmX::coverColumn(Node* c) {
     }
 }
 
-/// @brief Uncovers column as part of Algorithm X
-/// @param c The header of the column to be uncovered 
 void AlgorithmX::uncoverColumn(Node* c) {
     for (Node* rowNode = c->top; rowNode != c; rowNode = rowNode->top) {
         for (Node* colNode = rowNode->left; colNode != rowNode; colNode = colNode->left) {
@@ -85,9 +74,6 @@ void AlgorithmX::uncoverColumn(Node* c) {
     c->left->right = c;
 }
 
-/// @brief Chooses the column with least size
-/// @param root Root node of linked list
-/// @return The column header with least size
 Node* AlgorithmX::chooseColumn(Node* root) {
     Node* chosenCol = root->right;
     for (Node* t = chosenCol->right; t != root; t = t->right)
@@ -96,9 +82,6 @@ Node* AlgorithmX::chooseColumn(Node* root) {
     return chosenCol;
 }
 
-/// @brief Converts constraint matrix to linked list
-/// @param consMat Initialized constraint matrix of a sudoku
-/// @return 4 way circular linked list of an initialized sudoku with additional header nodes
 Node* AlgorithmX::toLinkedList(vector<array<int, Sudoku::CNS>> consMat) {
 
     Node* colHeaders[Sudoku::CNS];      // The column header nodes (not actual elements in constraint matrix)

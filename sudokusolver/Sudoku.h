@@ -5,7 +5,6 @@
 #include <array>
 #include <tuple>
 
-
 class Sudoku {
     public:
         const static int SIZE = 9;                                  // Side length of the sudoku
@@ -13,18 +12,27 @@ class Sudoku {
         const static int CNS = SIZE * SIZE * 4;                     // Number of constraint sets: 9*9*4
 
         Sudoku(int mat[SIZE][SIZE]);
-        int numMatrix[SIZE][SIZE];                                  // Sudoku matrix in basic form
+        int unsolvedSudokuMat[SIZE][SIZE];                          // Unsolved sudoku matrix
         std::vector<std::array<int, SIZE*SIZE*4>> fullCMat;         // Non-reduced constraint matrix (empty sudoku)
         std::vector<std::array<int, CNS>> CMat;                     // Reduced constraint matrix (initialized sudoku)
 
+        /// @brief Full constraint matrix of a sudoku (empty sudoku)
         std::vector<std::array<int, CNS>> fullConstraintMat();
 
+        /// @brief Reduces constraint matrix to match initialized sudoku
+        /// @param fullMatrix Full constraint matrix
+        /// @param occupied Number vectors of initially occupied cells (row, col, value-1)
+        /// @return Reduced constraint matrix
         const std::vector<std::array<int, CNS>> reduceMatrix(
-        std::vector<std::array<int, CNS>> fullMatrix, std::vector<std::tuple<int, int, int>> used);
+            std::vector<std::array<int, CNS>> fullMatrix, std::vector<std::tuple<int, int, int>> occupied);
 
+        /// @brief Converts sudoku matrix to a constraint matrix (for exact cover problem)
         const std::vector<std::array<int, CNS>> toConstraintMatrix();
 
+        /// @brief Converts solved constraint matrix to sudoku matrix
         std::vector<std::vector<int>> toSudokuMatrix(std::vector<std::array<int, CNS>> consMat);
+
+        /// @brief Prints sudoku solution
         void printMatrix(std::vector<std::vector<int>> mat);
 };
 
