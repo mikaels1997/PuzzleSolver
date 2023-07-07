@@ -1,6 +1,6 @@
 #include <iostream>
 #include "sudoku.h"
-#include "test.h"
+#include "algx.h"
 
 int main()
 {
@@ -18,8 +18,8 @@ int main()
         {0, 7, 0, 0, 0, 0, 0, 0, 0},
     };
     Sudoku sudoku(arr);
-    Test algx();
-    //algX.findExactCover(algX.root, sudoku.CMat);
-    //auto sol = sudoku.toSudokuMatrix(algX.solutionMat);
-    //sudoku.printMatrix(sol);
+    AlgorithmX algx(sudoku.CMat);
+    algx.findExactCover(algx.root, sudoku.CMat);
+    auto sol = sudoku.toSudokuMatrix(algx.solutionMat);
+    sudoku.printMatrix(sol);
 }
