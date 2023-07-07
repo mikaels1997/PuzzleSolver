@@ -19,7 +19,7 @@ int main()
     };
     Sudoku sudoku(arr);
     AlgorithmX algx(sudoku.CMat);
-    algx.findExactCover(algx.root, sudoku.CMat);
+    algx.findExactCover(algx.root);
     auto sol = sudoku.toSudokuMatrix(algx.solutionMat);
     sudoku.printMatrix(sol);
 }

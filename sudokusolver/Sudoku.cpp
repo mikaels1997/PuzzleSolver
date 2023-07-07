@@ -3,10 +3,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
-#include <stack>
-#include <numeric>
 #include <set>
-#include <algorithm>
 #include <tuple>
 
 using namespace std;
@@ -84,7 +81,7 @@ const vector<array<int, Sudoku::CNS>> Sudoku::toConstraintMatrix() {
 
 vector<vector<int>> Sudoku::toSudokuMatrix(vector<array<int, Sudoku::CNS>> consMat) {
     vector<vector<int>> sudokuMat(SIZE, vector<int>(SIZE, 0));
-    for (auto& vec : consMat) {
+    for (auto vec : consMat) {
         int numVec[3];
         for (int i=0; i<vec.size(); i++) {
             if (vec[i] == 1 && i < CLS) {
@@ -100,9 +97,10 @@ vector<vector<int>> Sudoku::toSudokuMatrix(vector<array<int, Sudoku::CNS>> consM
     }
     return sudokuMat;
 }
+
 void Sudoku::printMatrix(vector<vector<int>> mat) {
-    for (const auto& arr : mat) {
-        for (const auto& element : arr) {
+    for (const auto arr : mat) {
+        for (const auto element : arr) {
             cout << element << " ";
         }
         cout << endl;
