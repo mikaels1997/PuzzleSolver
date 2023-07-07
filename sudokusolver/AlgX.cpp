@@ -1,5 +1,5 @@
 #include "AlgX.h"
-#include "Sudoku.cpp"
+#include "sudoku.h"
 #include <vector>
 #include <array>
 #include <cmath>
@@ -7,6 +7,23 @@
 #include <numeric>
 #include <set>
 #include <algorithm>
+
+using namespace std;
+
+struct Node {
+    public:
+        Node* top;
+        Node* right;
+        Node* bottom;
+        Node* left;
+        int row = -1; // y coordinate
+        int col = -1; // x coordinate
+        int size = -1;
+        Node* colHeader;
+
+        Node() {};
+        Node(int r, int c, Node* h) : row(r), col(c), colHeader(h != NULL ? h : this) {}
+};
 
 class AlgorithmX {
     private:
