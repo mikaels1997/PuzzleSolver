@@ -117,7 +117,7 @@ Node* AlgorithmX::toLinkedList(vector<array<int, Sudoku::CNS>> consMat) {
             Node* n = new Node(r, c, colHeaders[c]);
             if (rowNodes.empty()) rowNodes.push_back(n);
 
-            // Forming 4 way connections the current node
+            // Forming 4 way connections of the current node
             n->left = rowNodes.back();
             rowNodes.back()->right = n;
             n->right = rowNodes.front();
