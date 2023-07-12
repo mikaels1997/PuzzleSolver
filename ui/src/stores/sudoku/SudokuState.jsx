@@ -4,7 +4,6 @@ class SudokuState {
   numDict = {};
 
   constructor() {
-    this.numDict = {};
     makeObservable(this, {
         numDict: observable,
         updateDigit: action,

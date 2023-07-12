@@ -1,8 +1,8 @@
 import SudokuGrid from "components/sudoku/SudokuGrid";
 import SudokuButtons from "components/sudoku/SudokuButtons";
 import SudokuState from "stores/sudoku/SudokuState";
+import PuzzleApi from "api";
 
-const SIZE = 9;
 const sudokuState = new SudokuState();
 
 const SudokuPage = () => {
@@ -11,6 +11,7 @@ const SudokuPage = () => {
     <div className="sudoku-view">
       <SudokuGrid state={sudokuState}/>
       <SudokuButtons state={sudokuState}/>
+      <PuzzleApi></PuzzleApi>
     </div>
   </div>
 };
