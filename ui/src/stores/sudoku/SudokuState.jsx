@@ -1,22 +1,30 @@
 import { makeObservable, observable, action } from 'mobx';
 
 class SudokuState {
-  numDict = {};
+  numMatrix = [];
 
   constructor() {
+    this.numMatrix = this.getEmptyMat();
     makeObservable(this, {
-        numDict: observable,
+      numMatrix: observable,
         updateDigit: action,
         resetDigits: action
     });
   }
 
-  updateDigit(key, value) {
-    this.numDict[key] = value;
+  updateDigit(row, col, value) {
+    this.numMatrix[row][col] = value;
   }
 
   resetDigits() {
-    this.numDict = {};
+    this.numMatrix = this.getEmptyMat();
+  }
+
+  getEmptyMat() {
+    let arr = new Array(9)
+    for(let i = 0;i<9;i++)
+        arr[i] = new Array(9)
+    return arr;
   }
 }
 

@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function PuzzleApi() {
+function PuzzleApi({state}) {
     const [response, setResponse] = useState('');
+    const payload = JSON.stringify(state.numMatrix);
     useEffect(() => {
-    axios.get('http://localhost:8080')
-        .then((res) => setResponse(res.data))
-        .catch((error) => console.error(error));
+        axios.post('http://localhost:8080/', payload)
+            .then((res) => setResponse(res.data))
+            .catch((error) => console.error(error));
     }, []);
-
     return (
     <div>
-        <p>Response from C++ Server:</p>
         <p>{response}</p>
     </div>
     );

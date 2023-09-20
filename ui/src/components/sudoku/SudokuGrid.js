@@ -33,7 +33,7 @@ const SudokuBox = ({row, col, state}) => {
 
 const SudokuCell = observer(({row, col, state}) => {
   return <input className="sudokucell"
-    value={state.numDict[`${row}-${col}`] ?? ""}
+    value={state.numMatrix[row][col] ?? ""}
     maxLength={2}
     onChange={(e) => changeInput(e, row, col, state)}
     onClick={handleClick}>
@@ -47,7 +47,7 @@ function changeInput(event, row, col, state) {
   const input = event.target;
   const inputValue = event.target.value;
   input.value = inputValue[inputValue.length - 1];
-  state.updateDigit(`${row}-${col}`, input.value);
+  state.updateDigit(row, col, input.value);
 }
 
 function handleClick(event) {
