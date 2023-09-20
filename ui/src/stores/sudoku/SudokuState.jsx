@@ -13,7 +13,7 @@ class SudokuState {
   }
 
   updateDigit(row, col, value) {
-    this.numMatrix[row][col] = value;
+    this.numMatrix[row][col] = Number.parseInt(value);
   }
 
   resetDigits() {

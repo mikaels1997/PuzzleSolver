@@ -1,5 +1,6 @@
 #include "sudoku.h"
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <array>
 #include <cmath>
@@ -97,6 +98,21 @@ namespace SudokuSolver {
             }
         }
         return sudokuMat;
+    }
+
+    std::string Sudoku::solutionAsString(vector<vector<int>> mat) {
+        std::stringstream ss;
+        int i = 0;
+        for (const auto arr : mat) {
+            for (const auto element : arr) {
+                ss << element;
+                if (i < 81) {
+                    ss << ' ';
+                }
+            }
+            i++;
+        }
+        return ss.str();
     }
 
     void Sudoku::printMatrix(vector<vector<int>> mat) {

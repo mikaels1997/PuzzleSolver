@@ -33,6 +33,9 @@ namespace SudokuSolver {
             /// @brief Converts solved constraint matrix to sudoku matrix
             std::vector<std::vector<int>> toSudokuMatrix(std::vector<std::array<int, CNS>> consMat);
 
+            /// @brief Flattened version of the sudoku matrix
+            std::string solutionAsString(std::vector<std::vector<int>> mat);
+
             /// @brief Prints sudoku solution
             void printMatrix(std::vector<std::vector<int>> mat);
     };

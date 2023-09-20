@@ -4,6 +4,8 @@
 #include <winsock2.h>
 #include <algorithm>
 #include "server.h"
+#include "sudoku.h"
+#include "algx.h"
 
 namespace SudokuSolver {
     Server::Server() {
@@ -106,7 +108,7 @@ namespace SudokuSolver {
         {
             request.erase (std::remove(request.begin(), request.end(), chars[i]), request.end());
         }
-        
+
         std::string origin;
         std::istringstream ss(request);
         std::string item;
@@ -117,6 +119,33 @@ namespace SudokuSolver {
             sudokuArr[count%9][count/9] = value;
             count++;
         }
-        return "HTTP/1.1 200 OK\r\nContent-Length: 23\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n\r\nHello from C++ Server!!";
+        std::string flattened = solveSudoku(sudokuArr);
+        char buffer[400];
+        const char* payload = flattened.c_str();
+        sprintf(buffer, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n\r\n%s", strlen(payload), payload);
+        return buffer;
+    }
+
+    std::string Server::solveSudoku(int arr[][9]) {
+        // int arr[9][9] = {
+        // {0, 0, 0, 7, 0, 0, 0, 0, 1},
+        // {0, 0, 0, 0, 0, 0, 8, 0, 0},
+        // {0, 2, 0, 8, 6, 0, 0, 5, 0},
+
+        // {0, 3, 0, 0, 0, 0, 0, 0, 0},
+        // {6, 0, 0, 0, 0, 0, 0, 8, 4},
+        // {0, 1, 2, 6, 0, 7, 0, 3, 0},
+
+        // {3, 0, 0, 5, 0, 0, 0, 2, 8},
+        // {0, 9, 4, 0, 0, 0, 3, 0, 7},
+        // {0, 7, 0, 0, 0, 0, 0, 0, 0},
+        // };
+        //std::cout << arr[0][0] << std::endl;
+        SudokuSolver::Sudoku sudoku(arr);
+        SudokuSolver::AlgorithmX algx(sudoku.CMat);
+        algx.findExactCover(algx.root);
+        auto sol = sudoku.toSudokuMatrix(algx.solutionMat);
+        std::string flattened = sudoku.solutionAsString(sol);
+        return flattened;
     }
 }
