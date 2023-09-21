@@ -116,7 +116,7 @@ namespace SudokuSolver {
         int count = 0;
         while (std::getline(ss, item, ',')) {
             int value = std::stoi(item != "null" ? item : "0");
-            sudokuArr[count%9][count/9] = value;
+            sudokuArr[count/9][count%9] = value;
             count++;
         }
         std::string flattened = solveSudoku(sudokuArr);
@@ -126,7 +126,7 @@ namespace SudokuSolver {
         return buffer;
     }
 
-    std::string Server::solveSudoku(int arr[][9]) {
+    std::string Server::solveSudoku(int arr[9][9]) {
         // int arr[9][9] = {
         // {0, 0, 0, 7, 0, 0, 0, 0, 1},
         // {0, 0, 0, 0, 0, 0, 8, 0, 0},
@@ -140,7 +140,6 @@ namespace SudokuSolver {
         // {0, 9, 4, 0, 0, 0, 3, 0, 7},
         // {0, 7, 0, 0, 0, 0, 0, 0, 0},
         // };
-        //std::cout << arr[0][0] << std::endl;
         SudokuSolver::Sudoku sudoku(arr);
         SudokuSolver::AlgorithmX algx(sudoku.CMat);
         algx.findExactCover(algx.root);
