@@ -34,10 +34,3 @@ def solve(req: SudokuRequest):
     return {
         "solution": flat_solution
     }
-
-# def flatten_grid(grid: list[list[int]]) -> str:
-#     return ",".join(str(cell) for row in grid for cell in row)
-
-# def unflatten_solution(flat: str) -> list[list[int]]:
-#     nums = list(map(int, flat.split(",")))
-#     return [nums[i:i+9] for i in range(0, 81, 9)]

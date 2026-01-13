@@ -6,7 +6,7 @@ class SudokuState {
   solution = [];
 
   constructor() {
-    this.numMatrix = this.getEmptyMat();
+    this.numMatrix = this.load();
     makeObservable(this, {
       numMatrix: observable,
       solution: observable,
@@ -15,12 +15,19 @@ class SudokuState {
     });
   }
 
+  load() {
+    const loaded = JSON.parse(localStorage.getItem("sudoku_grid"));
+    return loaded ?? this.getEmptyMat()
+  }
+
   updateDigit(row, col, value) {
     this.numMatrix[row][col] = value != 'undefined' ? Number.parseInt(value) : undefined;
+    localStorage.setItem("sudoku_grid", JSON.stringify(this.numMatrix))
   }
 
   resetDigits() {
     this.numMatrix = this.getEmptyMat();
+    localStorage.clear();
   }
 
   getEmptyMat() {
