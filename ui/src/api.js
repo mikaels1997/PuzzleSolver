@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-export async function sendSudoku(state) {
-    const payload = JSON.stringify(state.numMatrix);
+export async function sendSudoku(payload) {
     let response;
-    await axios.post('http://localhost:8080/', payload)
+    await axios.post('http://localhost:8000/solve', {grid: payload})
         .then((res) => {response = res.data;})
         .catch((error) => console.error(error));
     return response;

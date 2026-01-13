@@ -28,6 +28,7 @@ namespace SudokuSolver {
             Node* colHeader;
             Node* solution[Sudoku::CLS];
             std::vector<std::array<int, Sudoku::CNS>> unsolved;    // Unsolved exact cover constraint matrix
+            int search_n;                                          // Search number (to determine if solution can be found) 
 
         public:
             std::vector<std::array<int, Sudoku::CNS>> solutionMat; // Solved exact cover matrix

@@ -11,7 +11,6 @@ const SudokuPage = () => {
     <div className="sudoku-view">
       <SudokuGrid state={sudokuState}/>
       <SudokuButtons state={sudokuState}/>
-      {/* <PuzzleApi state={sudokuState}></PuzzleApi> */}
     </div>
   </div>
 };

@@ -20,6 +20,7 @@ namespace SudokuSolver {
     AlgorithmX::AlgorithmX(vector<array<int, Sudoku::CNS>> cMat) {
         unsolved = cMat;
         root = toLinkedList(cMat);
+        search_n = 0;
     };
 
     void AlgorithmX::findExactCover(Node* root) {
@@ -29,6 +30,10 @@ namespace SudokuSolver {
     }
 
     void AlgorithmX::search(int k) {
+        search_n ++;
+        if (search_n > 10000) {
+            return;
+        }
         if (root->right == root) {
             // Solution found !
             vector<array<int, Sudoku::CNS>> subMatrix;

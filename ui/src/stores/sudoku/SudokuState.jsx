@@ -16,7 +16,7 @@ class SudokuState {
   }
 
   updateDigit(row, col, value) {
-    this.numMatrix[row][col] = Number.parseInt(value);
+    this.numMatrix[row][col] = value != 'undefined' ? Number.parseInt(value) : undefined;
   }
 
   resetDigits() {
@@ -30,13 +30,21 @@ class SudokuState {
     return arr;
   }
 
+  getPayload() {
+    return this.numMatrix.flat().map(a => a == null ? 0 : a)
+  }
+
   async solveSudoku() {
-    const solutionStr = await sendSudoku(this);
-    //const solutionStr = "9 8 6 7 3 5 2 4 1 7 4 5 9 2 1 8 6 3 1 2 3 8 6 4 7 5 9 4 3 9 1 5 8 6 7 2 6 5 7 3 9 2 1 8 4 8 1 2 6 4 7 9 3 5 3 6 1 5 7 9 4 2 8 5 9 4 2 8 6 3 1 7 2 7 8 4 1 3 5 9 6"
-    const nums = solutionStr.split(" ");
+    const result = await sendSudoku(this.getPayload());
+    const nums = result.solution.split(" ");
     let solution = this.getEmptyMat();
+    let found = false;
     for (let i=0;i<81;i++) {
-      solution[Math.floor(i/9)][i%9]=Number.parseInt(nums[i]);
+      const num = Number.parseInt(nums[i]);
+      solution[Math.floor(i/9)][i%9]=num;
+      if (num !== 0) {
+        found = true;
+      }
     }
     this.numMatrix = solution;
   }

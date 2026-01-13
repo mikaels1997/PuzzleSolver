@@ -41,9 +41,10 @@ const SudokuCell = observer(({row, col, state}) => {
 });
 
 function changeInput(event, row, col, state) {
-  event.preventDefault();
-  event.target.value = event.target.value.replace(/[^1-9]/g, "");
-  if (event.target.value === "") return;
+  if (event.target.value !== "") {
+    event.target.value = event.target.value.replace(/[^1-9]/g, "");
+    if (event.target.value === "") return;
+  }
   const input = event.target;
   const inputValue = event.target.value;
   input.value = inputValue[inputValue.length - 1];

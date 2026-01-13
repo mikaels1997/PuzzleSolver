@@ -20,7 +20,7 @@
     * Optimization:         Dancing links technique (constraint matrix as 4-way circular linked list to be used in Algorithm X)
     *                       Speeds up the search considerably.
     * Solve steps:          Sudoku matrix -> constraint matrix -> linked list -> Knuth's Algorithm X -> solved constraint matrix -> solved sudoku matrix
-*/
+*/-
 #include <string>
 #include <cstring>
 #include <iostream>
@@ -40,37 +40,24 @@ extern "C" {
     }
 
     /// @brief
-    /// @param input Input in the form of []
+    /// @param input Input in the form of [1, 3, 4, 5, ... x81]
     /// @return
     __declspec(dllexport)
     const int handleRequest(const char* input, char* output, int output_size) {
         std::string request(input);
-        int sudokuArr[9][9] = {
-        {0, 0, 0, 7, 0, 0, 0, 0, 1},
-        {0, 0, 0, 0, 0, 0, 8, 0, 0},
-        {0, 2, 0, 8, 6, 0, 0, 5, 0},
+        char chars[] = "[]";
+        for (char c : chars)
+            request.erase(std::remove(request.begin(), request.end(), c), request.end());
 
-        {0, 3, 0, 0, 0, 0, 0, 0, 0},
-        {6, 0, 0, 0, 0, 0, 0, 8, 4},
-        {0, 1, 2, 6, 0, 7, 0, 3, 0},
-
-        {3, 0, 0, 5, 0, 0, 0, 2, 8},
-        {0, 9, 4, 0, 0, 0, 3, 0, 7},
-        {0, 7, 0, 0, 0, 0, 0, 0, 0},
-        };
-        // char chars[] = "[]";
-        // for (char c : chars)
-        //     request.erase(std::remove(request.begin(), request.end(), c), request.end());
-
-        // std::istringstream ss(request);
-        // std::string item;
-        // int sudokuArr[9][9];
-        // int count = 0;
-        // while (std::getline(ss, item, ',')) {
-        //     int value = std::stoi(item != "null" ? item : "0");
-        //     sudokuArr[count/9][count%9] = value;
-        //     count++;
-        // }
+        std::istringstream ss(request);
+        std::string item;
+        int sudokuArr[9][9];
+        int count = 0;
+        while (std::getline(ss, item, ',')) {
+            int value = std::stoi(item != "null" ? item : "0");
+            sudokuArr[count/9][count%9] = value;
+            count++;
+        }
 
         SudokuSolver::Sudoku sudoku(sudokuArr);
         SudokuSolver::AlgorithmX algx(sudoku.CMat);
@@ -82,9 +69,5 @@ extern "C" {
 
         std::memcpy(output, flattened.c_str(), flattened.size() + 1);
         return 0;
-        // *response = "HTTP/1.1 200 OK\r\nContent-Length: " +
-        //                 std::to_string(flattened.size()) +
-        //                 "\r\nContent-Type: text/plain\r\nAccess-Control-Allow-Origin: *\r\n\r\n" +
-        //                 flattened;
     }
 }
