@@ -1,5 +1,6 @@
 import { makeObservable, observable, action } from 'mobx';
 import { sendSudoku } from "api"
+import toastr from 'toastr';
 
 class SudokuState {
   numMatrix = [];
@@ -53,7 +54,10 @@ class SudokuState {
         found = true;
       }
     }
-    this.numMatrix = solution;
+    this.numMatrix = found ? solution : this.numMatrix;
+    if (!found) {
+      toastr.error("Solution not found!")
+    }
   }
 }
 
