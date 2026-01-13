@@ -6,7 +6,16 @@
 namespace SudokuSolver {
     using namespace std;
 
-    Node::Node(int r, int c, Node* h) : row(r), col(c), colHeader(h != NULL ? h : this) {}
+    Node::Node(int r, int c, Node* h)
+        : top(this),
+        right(this),
+        bottom(this),
+        left(this),
+        row(r),
+        col(c),
+        size(0),
+        colHeader(h ? h : this)
+    {}
 
     AlgorithmX::AlgorithmX(vector<array<int, Sudoku::CNS>> cMat) {
         unsolved = cMat;
@@ -95,7 +104,7 @@ namespace SudokuSolver {
         vector<Node*> rowNodes;
 
         // Init root node with connections (the top-left node)
-        Node* root = new Node();
+        Node* root = new Node(-1, -1, nullptr);;
         root->right = colHeaders[0];
         colHeaders[0]->left = root;
         root->left = colHeaders[Sudoku::CNS-1];
