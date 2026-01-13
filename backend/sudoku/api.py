@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from solver_wrapper import solve_sudoku
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,3 +34,12 @@ def solve(req: SudokuRequest):
     return {
         "solution": flat_solution
     }
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    if file.content_type not in ["image/png", "image/jpeg", "image/jpg"]:
+        raise HTTPException(status_code=400, detail="Only PNG or JPEG images are allowed")
+    file_location = file.filename
+    with open(file_location, "wb") as f:
+        f.write(await file.read())  # binary write
+    return {"filename": file.filename, "path": str(file_location)}

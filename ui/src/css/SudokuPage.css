@@ -35,8 +35,8 @@
     display: flex;
     margin-top: 20px;
     justify-content: space-between;
-    width: 50%;
     justify-self: center;
+    width: 100%;
 }
 
 .sudoku-button {
