@@ -26,15 +26,9 @@ def resize_for_display(image, max_w=900, max_h=700):
 def is_square(cnt):
     peri = cv2.arcLength(cnt, True)
     approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
-    return len(approx) == 4    
+    return len(approx) == 4
 
-def analyze_numbers(path):
-    if not path:
-        return []
-    img = cv2.imread(path)
-    if img is None:
-        raise RuntimeError("Image not found")
-
+def preprocess_img(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     hist = cv2.calcHist([gray], [0], None, [256], [0,256])
     hist = cv2.GaussianBlur(hist, (11,1), 0)
@@ -48,16 +42,16 @@ def analyze_numbers(path):
         255,
         cv2.THRESH_BINARY_INV
     )
+    return thresh
 
+def find_sudoku_grid(img, orig):
     contours, _ = cv2.findContours(
-        thresh,
+        img,
         cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
-    )
-    
+    ) 
     sudoku_contour = None
     max_area = 0
-
     for c in contours:
         area = cv2.contourArea(c)
         if area < 10000:
@@ -65,16 +59,12 @@ def analyze_numbers(path):
         if area > max_area and is_square(c):
             max_area = area
             sudoku_contour = c
-
     if sudoku_contour is None:
         raise RuntimeError("Sudoku grid not found")
-
     sudoku_contour = max(contours, key=cv2.contourArea)
     peri = cv2.arcLength(sudoku_contour, True)
     approx = cv2.approxPolyDP(sudoku_contour, 0.02 * peri, True)
-    
     rect = order_points(approx)
-
     side = 450
     dst = np.array([
         [0, 0],
@@ -82,20 +72,20 @@ def analyze_numbers(path):
         [side - 1, side - 1],
         [0, side - 1]
     ], dtype="float32")
-
     M = cv2.getPerspectiveTransform(rect, dst)
-    warped = cv2.warpPerspective(img, M, (side, side))
-    h, w = warped.shape[:2]
-    cell_w, cell_h = w // 9, h // 9
-    cells, pred = [], []
+    warped = cv2.warpPerspective(orig, M, (side, side))
+    return warped
 
+def extract_tiles(img):
+    h, w = img.shape[:2]
+    cell_w, cell_h = w // 9, h // 9
+    cells = []
     for i in range(9):
-        row = []
         for j in range(9):
             x1, y1 = j * cell_w, i * cell_h
             x2, y2 = (j + 1) * cell_w, (i + 1) * cell_h
             margin = 0
-            cell = warped[y1+margin:y2-margin, x1+margin:x2-margin]
+            cell = img[y1+margin:y2-margin, x1+margin:x2-margin]
             cv2.rectangle(cell, (0, 0), (cell.shape[1]-1, cell.shape[0]-1), (0, 0, 255), 1)
             gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
             _, binary = cv2.threshold(
@@ -104,10 +94,20 @@ def analyze_numbers(path):
             )
             kernel = np.ones((2, 2), np.uint8)
             clean = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
-            p = predict_digit(clean, False)
-            pred.append(p)     
-            row.append(cell)
-        cells.append(row)
+            cells.append(clean)
+    return cells
+
+def analyze_numbers(path):
+    if not path:
+        return []
+    img = cv2.imread(path)
+    if img is None:
+        raise RuntimeError("Image not found")
+
+    processed = preprocess_img(img)
+    warped = find_sudoku_grid(processed, img)
+    cells = extract_tiles(warped)
+    pred = [predict_digit(c) for c in cells]
 
     #f_count = [i if pred[i] != real[i] else 0 for i in range(len(pred))]
     #print(f_count)
