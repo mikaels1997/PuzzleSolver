@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from solver_wrapper import solve_sudoku
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+from num_parser import analyze_numbers
 
 class SudokuRequest(BaseModel):
     grid: List[int]  # 9x9
@@ -24,8 +25,6 @@ app.add_middleware(
 def solve(req: SudokuRequest):
     if len(req.grid) != 81:
         raise HTTPException(status_code=400, detail="Grid must be 9x9")
-
-    #flat_input = flatten_grid(req.grid)
     try:
         flat_solution = solve_sudoku(list(req.grid))
     except Exception as e:
@@ -37,9 +36,11 @@ def solve(req: SudokuRequest):
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
+    print("File received...")
     if file.content_type not in ["image/png", "image/jpeg", "image/jpg"]:
         raise HTTPException(status_code=400, detail="Only PNG or JPEG images are allowed")
     file_location = file.filename
     with open(file_location, "wb") as f:
         f.write(await file.read())  # binary write
-    return {"filename": file.filename, "path": str(file_location)}
+    numbers = analyze_numbers(file_location)
+    return {"filename": file.filename, "path": str(file_location), "numbers": numbers}

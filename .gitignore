@@ -34,3 +34,12 @@
 *.app
 
 __pycache__
+*.gz
+*-ubyte
+*.jpg
+*.png
+*.pth
+
+Main.cpp
+build.bat
+constants.py

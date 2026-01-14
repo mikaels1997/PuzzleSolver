@@ -11,6 +11,7 @@ class SudokuState {
     makeObservable(this, {
       numMatrix: observable,
       solution: observable,
+      setGrid: action,
       updateDigit: action,
       resetDigits: action
     });
@@ -23,12 +24,17 @@ class SudokuState {
 
   updateDigit(row, col, value) {
     this.numMatrix[row][col] = value != 'undefined' ? Number.parseInt(value) : undefined;
-    localStorage.setItem("sudoku_grid", JSON.stringify(this.numMatrix))
+    localStorage.setItem("sudoku_grid", JSON.stringify(this.numMatrix));
   }
 
   resetDigits() {
     this.numMatrix = this.getEmptyMat();
     localStorage.clear();
+  }
+
+  setGrid(grid) {
+    this.numMatrix = grid; 
+    localStorage.setItem("sudoku_grid", JSON.stringify(this.numMatrix));
   }
 
   getEmptyMat() {
