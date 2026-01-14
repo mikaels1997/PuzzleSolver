@@ -3,12 +3,8 @@ import numpy as np
 from PIL import Image
 from train import PrintedDigitModel
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torchvision
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+from torchvision import transforms
 from constants import MODEL_PATH
 
 model = PrintedDigitModel()
@@ -34,7 +30,7 @@ def preprocess(gray, display=False):
     total_pixels = cropped.size
     black_ratio = black_pixels / total_pixels
     if black_ratio > 0.95:
-        return None
+        return None # If center contains many black pixels, assume it contains no number
 
     img = Image.fromarray(resized)
     if display: 

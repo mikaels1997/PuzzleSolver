@@ -36,29 +36,31 @@ def analyze_numbers(path):
         raise RuntimeError("Image not found")
 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    hist = cv2.calcHist([gray], [0], None, [256], [0,256])
+    hist = cv2.GaussianBlur(hist, (11,1), 0)
+    background_level = int(np.argmax(hist))
+    delta = 40  # tolerance for ink darkness
+    threshold_value = max(0, background_level - delta)
 
-    thresh = cv2.adaptiveThreshold(
-        blur,
+    _, thresh = cv2.threshold(
+        gray,
+        threshold_value,
         255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY_INV,
-        11,
-        2
+        cv2.THRESH_BINARY_INV
     )
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    morph = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
+
     contours, _ = cv2.findContours(
-        morph,
+        thresh,
         cv2.RETR_EXTERNAL,
         cv2.CHAIN_APPROX_SIMPLE
     )
+    
     sudoku_contour = None
     max_area = 0
 
     for c in contours:
         area = cv2.contourArea(c)
-        if area < 8000:
+        if area < 10000:
             continue
         if area > max_area and is_square(c):
             max_area = area
@@ -103,7 +105,6 @@ def analyze_numbers(path):
             kernel = np.ones((2, 2), np.uint8)
             clean = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
             p = predict_digit(clean, False)
-            print(p)
             pred.append(p)     
             row.append(cell)
         cells.append(row)
@@ -122,7 +123,7 @@ def analyze_numbers(path):
     # grid_display = cv2.resize(grid_display, (w * scale, h * scale))
     # plt.imshow(grid_display, cmap='gray')
     # plt.show()
-   # print(pred)
+    #print(pred)
     return pred
 
 #analyze_numbers(TEST_IMAGE_PATH)
