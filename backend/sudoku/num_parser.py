@@ -30,18 +30,16 @@ def is_square(cnt):
 
 def preprocess_img(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    hist = cv2.calcHist([gray], [0], None, [256], [0,256])
-    hist = cv2.GaussianBlur(hist, (11,1), 0)
-    background_level = int(np.argmax(hist))
-    delta = 40  # tolerance for ink darkness
-    threshold_value = max(0, background_level - delta)
-
+    background = cv2.GaussianBlur(gray, (51, 51), 0)
+    normalized = cv2.divide(gray, background, scale=255)
     _, thresh = cv2.threshold(
-        gray,
-        threshold_value,
+        normalized,
+        0,
         255,
-        cv2.THRESH_BINARY_INV
+        cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
     )
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=10)  
     return thresh
 
 def find_sudoku_grid(img, orig):
