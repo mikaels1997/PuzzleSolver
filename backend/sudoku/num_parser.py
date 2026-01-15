@@ -39,7 +39,9 @@ def preprocess_img(img):
         cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
     )
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=10)  
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=3)
+    #plt.imshow(thresh, cmap='gray')
+    #plt.show()
     return thresh
 
 def find_sudoku_grid(img, orig):
@@ -124,4 +126,5 @@ def analyze_numbers(path):
     #print(pred)
     return pred
 
-#analyze_numbers(TEST_IMAGE_PATH)
+if __name__ == "__main__":
+    analyze_numbers(TEST_IMAGE_PATH)
