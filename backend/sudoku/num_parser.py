@@ -30,7 +30,7 @@ def is_square(cnt):
 
 def preprocess_img(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    background = cv2.GaussianBlur(gray, (51, 51), 0)
+    background = cv2.GaussianBlur(gray, (51, 51), 30)
     normalized = cv2.divide(gray, background, scale=255)
     _, thresh = cv2.threshold(
         normalized,

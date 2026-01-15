@@ -1,6 +1,6 @@
 import SudokuGrid from "components/sudoku/SudokuGrid";
 import SudokuButtons from "components/sudoku/SudokuButtons";
-import SudokuState from "stores/sudoku/SudokuState";
+import SudokuState from "stores/SudokuState";
 import PuzzleApi from "api";
 
 const sudokuState = new SudokuState();

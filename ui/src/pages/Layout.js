@@ -12,6 +12,10 @@ const Layout = () => {
             <Link to="/sudoku">Sudoku solver
             </Link>
           </li>
+          <li>
+            <Link to="/word-finder">Word finder
+            </Link>
+          </li>
         </ul>
       </nav>
 
