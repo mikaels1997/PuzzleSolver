@@ -1,5 +1,7 @@
 import { makeObservable, observable, action } from 'mobx';
 import toastr from 'toastr';
+import { sendWordGrid } from "api"
+
 
 class WordFinderState {
 
@@ -33,8 +35,9 @@ class WordFinderState {
         return arr;
     } 
 
-    solve() {
-        
+    async solve() {
+        const flat = this.input.flat();
+        await sendWordGrid(flat);
     }
 }
 

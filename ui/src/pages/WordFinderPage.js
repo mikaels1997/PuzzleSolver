@@ -1,5 +1,6 @@
 import WordFinderButtons from "components/wordfinder/WordFinderButtons";
 import WordFinderGrid from "components/wordfinder/WordFinderGrid";
+import WordResultContainer from "components/wordfinder/WordResultContainer";
 import WordFinderState from "stores/WordFinderState";
 
 const wordFinderState = new WordFinderState();
@@ -10,6 +11,7 @@ const WordFinderPage = () => {
     <div className="word-finder-view">
       <WordFinderGrid state={wordFinderState}/>
       <WordFinderButtons state={wordFinderState}/>
+      <WordResultContainer state={wordFinderState}/>
     </div>
   </div>
 };

@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from torch.utils.data import random_split
-from constants import DATASET_PATH, MODEL_PATH
+from .constants import DATASET_PATH, MODEL_PATH
 
 class PrintedDigitModel(nn.Module):
     def __init__(self):

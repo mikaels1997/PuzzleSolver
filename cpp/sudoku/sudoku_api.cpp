@@ -28,17 +28,8 @@
 #include <algorithm>
 #include "sudoku.h"
 #include "algx.h"
-#include <string>
 
 extern "C" {
-    __declspec(dllexport)
-    const char* hello(const char* name) {
-        static std::string s;
-        s = "Hello ";
-        s += name;
-        return s.c_str();
-    }
-
     /// @brief
     /// @param input Input in the form of [1, 3, 4, 5, ... x81]
     /// @return

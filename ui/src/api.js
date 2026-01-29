@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function sendSudoku(payload) {
     let response;
-    await axios.post('http://localhost:8000/solve', {grid: payload})
+    await axios.post('http://localhost:8000/solve_sudoku', {grid: payload})
         .then((res) => {response = res.data;})
         .catch((error) => console.error(error));
     return response;
@@ -20,4 +20,12 @@ export async function sendSudokuFile(file) {
     .then(res => response = res.data)
     .catch(err => console.error(err));
     return response
-}    
+}
+
+export async function sendWordGrid(payload) {
+    let response;
+    await axios.post('http://localhost:8000/solve_word_grid', {grid: payload})
+        .then((res) => {response = res.data;})
+        .catch((error) => console.error(error));
+    return response;
+}

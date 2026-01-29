@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
-from model import predict_digit
+from .model import predict_digit
 import matplotlib.pyplot as plt
-from constants import TEST_IMAGE_PATH
+from .constants import TEST_IMAGE_PATH
 
 def order_points(pts):
     pts = pts.reshape(4, 2)

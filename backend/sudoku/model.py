@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
 from PIL import Image
-from train import PrintedDigitModel
+from .train import PrintedDigitModel
 import torch
 import torchvision.transforms as transforms
 from torchvision import transforms
-from constants import MODEL_PATH
+from .constants import MODEL_PATH
 
 model = PrintedDigitModel()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

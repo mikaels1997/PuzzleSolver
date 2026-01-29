@@ -2,7 +2,7 @@ import ctypes
 import os
 
 # Load DLL
-dll_path = os.path.abspath("../../cpp/build/libsudoku.dll")
+dll_path = os.path.abspath("../cpp/build/libsudoku.dll")
 sudoku = ctypes.CDLL(dll_path)
 
 # Function signature
